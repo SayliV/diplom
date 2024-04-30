@@ -2,6 +2,9 @@
 # 2 симваола расширения года, и последный символ то что файл архивирован.
 
 import os
+import pandas as pd
+
+errors = []
 
 def compare_year_folder_and_extension(file_path):
     # Получаем путь к папке файла без последнего компонента (имя файла)
@@ -37,7 +40,7 @@ def compare_year_folder_and_extension(file_path):
         else:
             return 'Лежит не в том годе'
     else:
-        return 'Что то не так с файлом'
+        return 'Что то не так с именем файла'
 
 
 # file_path = "/media/storage/simurg/simurg/2019/091/obs/garner.ucsd.edu/blsa0910.19d.Z"
@@ -47,9 +50,20 @@ def compare_year_folder_and_extension(file_path):
 def process_file(file_path):
     with open(file_path, 'r') as file:
         for line_number, line in enumerate(file, 1):
-            print(f"Line {line_number}: {compare_year_folder_and_extension(line.strip())}")
-file_path = r'C:\Users\lenovoPC\PycharmProjects\path analysis\broken_files_done.txt'  # Укажите путь к вашему файлу с путями
+            result = compare_year_folder_and_extension(line.strip())
+            if result != True:
+                errors.append({
+                    'File Name': os.path.basename(line.strip()),
+                    'Year': result[0],
+                    'Day': result[1],
+                    'Error Status': result
+                })
+            #print(result)
 
+
+file_path = r'D:\Python\analysis path\broken_file.txt'
 process_file(file_path)
 
-#станция день год статус и имя файла в ексель таблицу
+df = pd.DataFrame(errors)
+
+df.to_excel('errors_path_file_table.xlsx')
