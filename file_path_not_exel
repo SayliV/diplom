@@ -1,0 +1,55 @@
+# формат наименовая файла: первые 4 символа - это имя станции, далее 3 символа день с начала года,
+# 2 симваола расширения года, и последный символ то что файл архивирован.
+
+import os
+
+def compare_year_folder_and_extension(file_path):
+    # Получаем путь к папке файла без последнего компонента (имя файла)
+    folder_path = os.path.dirname(file_path)
+    head, tail = os.path.split(file_path)
+    # Получаем имя папки 2019 года
+    year_folder = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(folder_path))))
+    day_folder = os.path.basename(os.path.dirname(os.path.dirname(folder_path)))
+    #print(day_folder)
+    #print("Tail:", tail)
+    # Получаем все расширения файла
+    file_name = os.path.basename(file_path)
+    file_extensions = file_name.split('.')[1:]
+    #print(file_extensions)
+    # Ищем последнее расширение, начиная с конца списка
+    last_extension = file_extensions[0]
+    #print(last_extension)
+    # Проверяем, совпадают ли имя папки и последнее расширение файла
+
+    index_expansion=last_extension[0:2]
+    #print(index_expansion)
+    day_index = tail[4:7]
+    #print(day_index)
+    last_index_year=year_folder[2:4]
+    #print(last_index_year)
+    if len(tail) >13:
+        if index_expansion == last_index_year:
+            if day_index == day_folder:
+                return True
+            else:
+                return 'Лежит не в том дне'
+
+        else:
+            return 'Лежит не в том годе'
+    else:
+        return 'Что то не так с форматом имени файла'
+
+
+# file_path = "/media/storage/simurg/simurg/2019/091/obs/garner.ucsd.edu/blsa0910.19d.Z"
+# result = compare_year_folder_and_extension(file_path)
+# print(result)
+
+def process_file(file_path):
+    with open(file_path, 'r') as file:
+        for line_number, line in enumerate(file, 1):
+            print(f"Line {line_number}: {compare_year_folder_and_extension(line.strip())}")
+file_path = r'C:\Users\lenovoPC\PycharmProjects\path analysis\broken_files_done.txt'  # Укажите путь к вашему файлу с путями
+
+process_file(file_path)
+
+#станция день год статус и имя файла в ексель таблицу
