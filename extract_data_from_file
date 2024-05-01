@@ -1,0 +1,39 @@
+# -*- coding: cp1251 -*-
+# r'C:\Users\SayliV\Desktop\diplom\0-100.txt'
+
+import os
+
+def extract_filename_from_file(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+        # Разделяем содержимое файла по символу новой строки
+        lines = content.split('\n')
+        for line in lines:
+            if line.startswith("C:\\Users\\"):
+                # Извлекаем имя файла из строки
+                file_name = line.split('\\')[-1].split()[0]
+                return file_name
+
+# Путь к файлу, из которого нужно извлечь имя файла
+
+def extract_data_from_file(file_path):
+    with open(file_path, 'r') as file:
+        data = file.read()
+
+    # Извлекаем дату
+    date_start = data.find('processing...') + len('processing...')
+    date_end = data.find('done.', date_start)
+    date = data[date_start:date_end].strip()
+
+    # Извлекаем информацию об обработке
+    processed_info = 'Обработка завершена' if 'done.' in data else 'Обработка не завершена'
+
+    return date, processed_info
+
+# Пример использования функции для извлечения данных из текстового файла
+file_path = r'D:\Python\extracted data to exel\0-100.txt'
+file_name = extract_filename_from_file(file_path)
+date, processed_info = extract_data_from_file(file_path)
+print("Имя файла:", file_name)
+print("Дата:", date)
+print("Статус обработки:", processed_info)
