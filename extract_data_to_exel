@@ -1,9 +1,7 @@
 # -*- coding: cp1251 -*-
-# r'C:\Users\SayliV\Desktop\diplom\0-100.txt'
 
-import os
 import pandas as pd
-
+#функция извлечения имени из пути
 def extract_filename_from_file(file_path):
     with open(file_path, 'r') as file:
         content = file.read()
@@ -13,8 +11,20 @@ def extract_filename_from_file(file_path):
                 file_name = line.split('\\')[-1].split()[0]
                 return file_name
 
-def extract_data_from_file(file_path):
+#функция извлечения даты и инормации об обработки файла
+def extract_errors_warning_from_file(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+        warning_start = content.find('[WARNING]')
+        if warning_start != -1:
+            warning_end = content.find('\n', warning_start)
+            warning = content[warning_start:warning_end].strip()
+            return warning
+        else:
+            return "No warning found in the file"
 
+#функция извлечения ошибок и предупреждений из файла
+def extract_data_from_file(file_path):
     with open(file_path, 'r') as file:
         data = file.read()
         date_start = data.find('processing...') + len('processing...')
@@ -22,17 +32,19 @@ def extract_data_from_file(file_path):
         date = data[date_start:date_end].strip()
         processed_info = 'Обработка завершена' if 'done.' in data else 'Обработка не завершена'
         return date, processed_info
-
+#функция записи полученных данных в ексель таблицу
 def extract_data_to_exel(file_path):
     data_to_exel = []
     with open(file_path, 'r') as file:
         for line in file:
             file_name = extract_filename_from_file(file_path)
             date, processed_info = extract_data_from_file(file_path)
+            warning = extract_errors_warning_from_file(file_path)
             data_to_exel.append({
                 'File Name': file_name if file_name else '',
                 'Data': date if date else '',
-                'Status': processed_info if processed_info else ''
+                'Status': processed_info if processed_info else '',
+                'Warning': warning if warning else ''
             })
 
     df = pd.DataFrame(data_to_exel)
@@ -42,5 +54,6 @@ def extract_data_to_exel(file_path):
 file_path = r'D:\Python\extracted data to exel\0-100.txt'
 file_name = extract_filename_from_file(file_path)
 date, processed_info = extract_data_from_file(file_path)
-
+warning = extract_errors_warning_from_file(file_path)
 extract_data_to_exel(file_path)
+
