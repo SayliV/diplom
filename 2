@@ -1,0 +1,45 @@
+import pandas as pd
+
+
+# Функция извлечения имени из пути
+def extract_filename_from_file(file_path):
+    file_name = file_path.split('\\')[-1]
+    return file_name
+
+
+# Функция извлечения даты и информации об обработке файла
+def extract_data_from_file(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        date = None
+        processed_info = None
+        for line in lines:
+            if '- processing' in line:
+                date = line.split('...')[1].strip()
+            if 'done.' in line:
+                processed_info = 'Обработка завершена'
+        error = 'Нет ошибок'  # Здесь можно добавить логику для поиска ошибок
+        return date, processed_info, error
+
+
+# Функция записи полученных данных в Excel таблицу
+def extract_data_to_excel(file_paths):
+    data_to_excel = []
+    for file_path in file_paths:
+        file_name = extract_filename_from_file(file_path)
+        date, processed_info, error = extract_data_from_file(file_path)
+        data_to_excel.append({
+            'File Name': file_name,
+            'Data': date,
+            'Status': processed_info,
+            'Error': error
+        })
+
+    df = pd.DataFrame(data_to_excel)
+    df.to_excel('extracted_data_from_files.xlsx', index=False)
+
+
+# Список путей к файлам
+file_paths = r'D:\Python\Extreacted_to_exel\0.txt'
+
+extract_data_to_excel(file_paths)
